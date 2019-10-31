@@ -1,13 +1,13 @@
 <template>
     <div class="singer" ref="singer">
-        <list-view @select="selectSinger" :data="singers"></list-view>
+        <!-- <list-view @select="selectSinger" :data="singers"></list-view> -->
         <router-view></router-view>
     </div>
 </template>
 <script>
     import {getSingerList} from 'api/singer'
     import {ERR_OK} from 'api/config'
-    import Singer from 'common/js/singer' 
+    import Singer from 'common/js/singer'
     import ListView from 'base/listview/listview'
     import {mapMutations} from 'vuex'
 
@@ -28,8 +28,7 @@
                 getSingerList().then((res) => {
                     console.log(res)
                     if(res.code === ERR_OK){
-                        this.singers = this._normalizeSinger(res.data.list)
-                        console.log(this._normalizeSinger(this.singers))
+                        // this.singers = this._normalizeSinger(res.data.list)
                     }
                 })
             },

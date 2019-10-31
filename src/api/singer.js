@@ -16,6 +16,7 @@ export function getSingerList() {
     platform: 'yqq',
     g_tk: 1664029744
   })
+  console.log(data)
     return jsonp(url, data, options)
 
     // return axios.get(url,{
