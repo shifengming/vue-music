@@ -1,17 +1,20 @@
 <template>
-    <div class="singer">
-        <list-view :data="singers"></list-view>
+    <div class="singer" ref="singer">
+        <list-view @select="selectSinger" :data="singers"></list-view>
+        <router-view></router-view>
     </div>
 </template>
 <script>
     import {getSingerList} from 'api/singer'
     import {ERR_OK} from 'api/config'
-    import Singer from 'common/js/singer'
+    import Singer from 'common/js/singer' 
     import ListView from 'base/listview/listview'
+    import {mapMutations} from 'vuex'
 
     const HOT_NAME = '热门'
-    const HOT_SINGER_LEN = 10
+    const HOT_SINGER_LEN = 10//热门数据10条
     export default {
+        name: 'singer',
         data() {
             return{
                 singers: []
@@ -23,15 +26,24 @@
         methods:{
             _getSingerList(){
                 getSingerList().then((res) => {
+                    console.log(res)
                     if(res.code === ERR_OK){
                         this.singers = this._normalizeSinger(res.data.list)
                         console.log(this._normalizeSinger(this.singers))
                     }
                 })
             },
+            //vue的编程式开发
+            selectSinger(singer){
+                this.$router.push({
+                    path: `/singer/${singer.id}`
+                })
+                this.setSinger(singer)
+                },
+                //规范歌手
             _normalizeSinger(list){
                 let map ={
-                    hot: {
+                    hot: {//热门数据
                         title: HOT_NAME,
                         items: []
                     }
@@ -44,7 +56,9 @@
                             name: item.Fsinger_name
                         }))
                     }
+                    //通过Findex进行聚类
                     const key = item.Findex
+                    //判断map中有没这个key
                     if(!map[key]){
                         map[key] = {
                             title: key,
@@ -67,11 +81,15 @@
                     hot.push(val)
                     }
                 }
+                //对ret按字母的升序进行排列
                 ret.sort((a,b) => {
                     return a.title.charCodeAt(0) - b.title.charCodeAt(0)
                 })
                 return hot.concat(ret)
-            }
+            },
+             ...mapMutations({
+                setSinger: 'SET_SINGER'
+            })
         },
         components:{
             ListView

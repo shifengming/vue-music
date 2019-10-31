@@ -5,7 +5,9 @@ export default function jsonp(url, data, option){
     url += (url.indexOf('?') < 0 ? '?' : '&') + param(data)
 
     return new Promise((resolve, reject) => {
+        //console.log(resolve)
         originJSONP(url, option, (err, data) => {
+            console.log(data)
             if(!err){
                 resolve(data)
             } else {
