@@ -2,6 +2,7 @@ export default class Song {
     constructor({id,mid,singer,name,album,duration,image,url}){
         //做这些初始化，绑定到当前实例对象上
         //把这里设置为类有两大好处，可以把代码集中到一个地方维护，不需要在大量的地方去写代码，类的扩展性要比对象强很多，而且它是一种面向对象的编程方式
+
         this.id = id
         this.mid = mid
         this.singer = singer

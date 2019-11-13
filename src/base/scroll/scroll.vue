@@ -25,10 +25,10 @@
                 type: Boolean,
                 default: false
             },
-         pullup: {
-            type: Boolean,
-            default: false
-            },
+            pullup: {
+                type: Boolean,
+                default: false
+                },
             // 解决移动端失去焦点输入框隐藏
             beforeScroll: {
                 type: Boolean,
