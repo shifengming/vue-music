@@ -38,7 +38,7 @@
                     path: `/singer/${singer.id}`
                 })
                 this.setSinger(singer)
-                },
+            },
                 //规范歌手
             _normalizeSinger(list){
                 let map ={
@@ -86,6 +86,7 @@
                 })
                 return hot.concat(ret)
             },
+            //通过扩展运算符把mutations修改映射成一个方法名
              ...mapMutations({
                 setSinger: 'SET_SINGER'
             })
