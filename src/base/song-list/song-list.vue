@@ -26,8 +26,9 @@
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
-    @import "~common/stylus/variable"
-    @import "~common/stylus/mixin"
+  @import "~common/stylus/variable"
+  @import "~common/stylus/mixin"
+
     .song-list
       .item
         display: flex
@@ -42,8 +43,11 @@
           .name
             no-wrap()
             color: $color-text
+            // border-bottom: 1px solid rgb(228, 228, 228)
+            // color: red
           .desc
             no-wrap()
             margin-top: 4px
             color: $color-text-d
+            // color: red
 </style>

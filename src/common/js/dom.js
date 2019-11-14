@@ -30,6 +30,8 @@ export function addClass (el, className) {
     return el.getAttribute(prefix + name)
   }
   
+
+  //创建一个div
   let elementStyle = document.createElement('div').style
   
   // 浏览器供应商
@@ -41,7 +43,7 @@ export function addClass (el, className) {
       ms: 'msTransform',
       standard: 'transform'
     }
-  
+  //遍历key
     for (let key in transformNames) {
       if (elementStyle[transformNames[key]] !== undefined) {
         return key
@@ -59,7 +61,7 @@ export function addClass (el, className) {
     if (vendor === 'standard') {
       return style
     }
-  
+  //首字母大写加上剩余部分
     return vendor + style.charAt(0).toUpperCase() + style.substr(1)
   }
   
