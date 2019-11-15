@@ -9,19 +9,22 @@
       <!--页面路由跳转后信息显示的位置-->
       <router-view></router-view>
     </keep-alive>
-    <!--播放器-->
-    <!-- <player></player> -->
+    <!--应用相关的播放器-->
+    <player></player>
+
   </div>
 </template>
 
 <script>
 import MHeader from 'components/m-header/m-header'
 import Tab from 'components/tab/tab'
+import Player from 'components/player/player'
 export default {
   name: 'App',
   components: {
     MHeader,
-    Tab
+    Tab,
+    Player
   }
 }
 </script>
