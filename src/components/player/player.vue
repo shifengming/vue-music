@@ -1,5 +1,11 @@
 <template>
     <div class="player" v-show="playlist.length>0">
+      <transition name="normal"
+                  @enter="enter"
+                  @after-enter="afterEnter"
+                  @leave="leave"
+                  @after-leave="afterLeave"
+      >
         <div class="normal-player" v-show="fullScreen">
             <div class="background">
                 <img width="100%" height="100%" :src="currentSong.image">
@@ -13,7 +19,7 @@
             </div>
             <div class="middle">
                 <div class="middle-l">
-                    <div class="cd-wrapper">
+                    <div class="cd-wrapper" ref="cdWrapper">
                         <div class="cd">
                             <img class="image" :src="currentSong.image">
                         </div>
@@ -29,7 +35,7 @@
                         <i class="icon-prev"></i>
                     </div>
                     <div class="icon i-center">
-                        <i class="icon-play"></i>
+                        <i @click="togglePlaying" class="icon-play"></i>
                     </div>
                     <div class="icon i-right">
                         <i class="icon-next"></i>
@@ -40,8 +46,10 @@
                 </div>
             </div>
         </div>
+      </transition>
 
-        <div class="mini-play" v-show="!fullScreen" @click="open">
+      <transition name="mini">
+        <div class="mini-player" v-show="!fullScreen" @click="open">
             <div class="icon">
                 <img width="40" height="40" :src="currentSong.image">
             </div>
@@ -54,34 +62,118 @@
                 <i class="icon-playlist"></i>
             </div>
         </div>
+      </transition>
+      <audio ref="audio" :src="currentSong.url"> 
+
+      </audio>
     </div>
 </template>
 <script type="text/ecmascript-6">
     import {mapGetters,mapMutations} from 'vuex'
+    import animations from 'create-keyframe-animation'
+    import {prefixStyle} from 'common/js/dom'
+
+    const transform = prefixStyle('transform')
 
     export default{
         computed: {
+          playIcon () {
+            return this.playing ? 'icon-pause' : 'icon-play'
+          },
             ...mapGetters([
                 'fullScreen', 
                 'playlist',
-                'currentSong'
+                'currentSong',
+                'playing'
             ])
         },
         methods:{
-            
             back(){
                 this.setFullScreen(false)
             },
             open(){
                 this.setFullScreen(true)
             },
+            enter(el, done){
+              const {x, y, scale} = this._getPosAndScale()
+
+              let animation = {
+                0: {
+                  transfrom: `translate3d(${x}px,${y}px,0) scale(${scale})`
+                },
+                60:{
+                  transfrom: `translate3d(0,0,0) scale(1.1)`
+                },
+                100: {
+                  transfrom: `translate3d(0,0,0) scale(1)`
+                }
+              }
+              animations.registerAnimation({
+                name: 'move',
+                animation,
+                presets: {
+                  duration: 400,
+                  easing: 'linear'
+                }
+              })
+              animations.runAnimation(this.$refs.cdWrapper, 'move',done)
+            },
+            afterEnter(){
+              animations.unregisterAnimation('move')
+              this.$refs.cdWrapper.style.animation = ''
+            },
+            leave(el, done){
+              this.$refs.cdWrapper.style.transition = 'all 0.4s'
+              const {x,y,scale} = this._getPosAndScale()
+              this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
+              this.$refs.cdWrapper.addEventListener('transitionend', done)
+
+            },
+            afterLeave(){
+              this.$refs.cdWrapper.style.transition = ''
+              this.$refs.cdWrapper.style[transform] = ''
+            },
+            togglePlaying(){
+              this.setPlayigState(!this.playing)
+            },
+            _getPosAndScale(){
+              const targetWidth = 40
+              const paddingLeft = 40
+              const paddingBottom = 30
+              const paddingTop = 80
+              const width = window.innerWidth = 0.8
+              const scale = targetWidth/width
+              const x = -(window.innerWidth/2 - paddingLeft)
+              const y = window.innerHeight - paddingTop - width/2 - paddingBottom
+              return{
+                x,
+                y,
+                scale
+              }
+            },
             ...mapMutations({
-                setFullScreen: 'SET_FULL_SCREEN'
+                setFullScreen: 'SET_FULL_SCREEN',// 改变mutation来改变是否是全屏（显示大图）
+                setPlayigState:'SET_PLAYING_STATE'
             })
             
         },
         mounted(){
             console.log(this.$store.getters.currentSong)
+            
+        },
+        //通过watch看currentSong发生的变化
+        watch:{
+          currentSong(){
+            this.$nextTick(() => {
+              this.$refs.audio.play()
+            })
+          },
+            playing (newPlaying) {
+              const audio = this.$refs.audio // 给audio缓存
+              this.$nextTick(() => {
+                newPlaying ? audio.play() : audio.pause()
+              })
+          }
         }
     }
 </script>

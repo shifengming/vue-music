@@ -16,6 +16,7 @@ export const currentIndex = state => state.currentIndex
 //通过playlist和currentIndex去取得currentSong
 //如果取不到就给它一个默认的{}
 export const currentSong = (state) => {
+    console.log(state)
     return state.playlist[state.currentIndex] || {}
   }
 
