@@ -1,6 +1,7 @@
 <template>
     <div class="progress-bar" ref="progressBar" @click="progressClick">
         <div class="bar-inner">
+            <!-- 整个进度条 -->
             <div class="progress" ref="progress"></div>
             <div class="progress-btn-wrapper" ref="progressBtn"
                 @touchstart.prevent="progressTouchStart"

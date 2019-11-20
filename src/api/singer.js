@@ -55,4 +55,3 @@ export function getMusic (songmid) {
     return Promise.resolve(res.data)
   })
 }
-

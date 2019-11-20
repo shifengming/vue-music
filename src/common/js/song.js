@@ -1,7 +1,7 @@
 import {getLyric} from 'api/song'
 import {ERR_OK} from 'api/config'
 import {Base64} from 'js-base64'
-import { reject } from 'q'
+// import { reject } from 'q'
 
 export default class Song {
     constructor({id,mid,singer,name,album,duration,image,url}){
@@ -17,22 +17,23 @@ export default class Song {
         this.image = image
         this.url = url
     }
-    getLyric(){
-        if(this.lyric){
-            return Promise.resolve(this.lyric)
+    getLyric () {
+        if (this.lyric) {
+          return Promise.resolve(this.lyric)
         }
-        return new Promise((resolve, reject)=>{
-            getLyric(this.mid).then((res) => {
-                if(res.retcode === ERR_OK){
-                    this.lyric = Base64.decode(res.lyric)
-                    // console.log(this.lyric)
-                    resolve(this.lyric)
-                }else{
-                    reject('no lyric')
-                }
-            })
+    
+        return new Promise((resolve, reject) => {
+          getLyric(this.mid).then((res) => {
+            console.log(res)
+            if (res.retcode === ERR_OK) {
+              this.lyric = Base64.decode(res.lyric)
+              resolve(this.lyric)
+            } else {
+              reject(new Error('no lyric'))
+            }
+          })
         })
-    }
+      }
 }
 //扩展一个方法
 export function createSong(musicData, songVkey){
@@ -45,7 +46,8 @@ export function createSong(musicData, songVkey){
         duration: musicData.interval,
         image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
         // url: `http://dl.stream.qqmusic.qq.com/C400${musicData.songmid}.m4a?vkey=${songVkey}&guid=1849502645&fromtag=66`
-
+        // url: `http://thirdparty.gtimg.com/C100${musicData.songmid}.m4a?fromtag=38`
+        url: `https://thirdparty.gtimg.com/${musicData.songid}.m4a?fromtag=38`
     })
 }
 function filterSinger(singer){
