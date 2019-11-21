@@ -37,7 +37,7 @@ export function getDiscList () {
     return Promise.resolve(res.data)
   })
 }
-// 获取歌单列表
+// 获取歌曲列表
 export function getSongList (dissid) {
   const url = '/api/getSongList'
   const data = Object.assign({}, commonParams, {

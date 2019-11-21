@@ -47,7 +47,7 @@
                       <p ref="lyricLine"
                         class="text"
                         :class="{'current' :currentLineNum === index}"
-                        v-for="(line,index) in currentLyric.lines">
+                        v-for="(line,index) in currentLyric.lines" :key="index">
                         {{line.txt}}
                       </p>
                     </div>
@@ -139,7 +139,7 @@
     const transform = prefixStyle('transform')
     const transitionDuration = prefixStyle('transitionDuration')
 
-    export default{
+    export default {
       data(){
         return {
           songReady: false, // 歌曲是否加载完成（注意：防止我们快速点击上一曲下一曲产生的DOM报错）
@@ -158,9 +158,9 @@
           playIcon () {
             return this.playing ? 'icon-pause' : 'icon-play'
           },
-          iconMode(){
-            return this.mode === playMode.sequence? 'icon-sequence' :this.mode === playMode.loop ? 'icon-loop': 'icon-random'
-          },
+          iconMode () {
+            return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+          },  
           miniIcon(){
             return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
           },
@@ -172,17 +172,17 @@
           },
           //这样就可以通过this.mode这种形式访问mode播放模式
             ...mapGetters([
-                'fullScreen', 
-                'playlist',
-                'currentSong',
-                'playing',
-                'currentIndex',
-                'mode',
-                'sequenceList'
+                'fullScreen', //是否全屏
+                'playlist',//播放列表
+                'currentSong',//当前播放的歌曲
+                'playing',//播放列表
+                'currentIndex',//当前播放歌曲
+                'mode',//歌曲播放模式
+                'sequenceList'//顺序的歌曲列表
             ])
         },
-        //为什么要在created里面定义，因为不需要添加getters, state
         created(){
+          //在created()钩子函数中添加属性是因为不需要添加getter喝setter
           this.touch = {}
         },
         methods:{
@@ -193,31 +193,35 @@
                 this.setFullScreen(true)
             },
             enter(el, done){
+              //el是作用的那个元素，done是执行动画完成后执行的done回调函数才能执行下面的函数
               const {x, y, scale} = this._getPosAndScale()
 
               let animation = {
                 0: {
-                  transfrom: `translate3d(${x}px,${y}px,0) scale(${scale})`
+                  transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
                 },
                 60:{
-                  transfrom: `translate3d(0,0,0) scale(1.1)`
+                  transform: `translate3d(0,0,0) scale(1.1)`
                 },
                 100: {
-                  transfrom: `translate3d(0,0,0) scale(1)`
+                  transform: `translate3d(0,0,0) scale(1)`
                 }
               }
               animations.registerAnimation({
-                name: 'move',
-                animation,
-                presets: {
-                  duration: 400,
-                  easing: 'linear'
+                name: 'move',//注册动画名称
+                animation,//执行动画
+                presets: {//预设置值
+                  duration: 400,//动画执行的时间
+                  easing: 'linear'//动画执行的变化行为
                 }
               })
+              //开启动画  作用于那个元素，动画名称，执行done回调函数执行下列函数
               animations.runAnimation(this.$refs.cdWrapper, 'move',done)
             },
             afterEnter(){
+              //动画完成后销毁动画
               animations.unregisterAnimation('move')
+              //CD元素上的动画也要销毁
               this.$refs.cdWrapper.style.animation = ''
             },
             leave(el, done){
@@ -231,6 +235,7 @@
               this.$refs.cdWrapper.style.transition = ''
               this.$refs.cdWrapper.style[transform] = ''
             },
+            //暂停播放歌曲
             togglePlaying(){
               if(!this.songReady){
                 return
@@ -240,54 +245,76 @@
                 this.currentLyric.togglePlay()
               }
             },
+            //当前歌曲播放完了
             end(){
+              //判断当前播放模式是否是单曲循环
               if(this.mode = playMode.loop){
                 this.loop()
               }else{
                 this.next()
               }
             },
-            loop(){
+            
+             // 单曲循环
+            loop () {
+              // 将audio标签的当前时间currentTime设置为0进度条就会跑到最左边
               this.$refs.audio.currentTime = 0
+              // 然后打开播放
               this.$refs.audio.play()
-              if(this.currentLyric){
+              this.setPlayingState(true)
+              // 如果在单曲循环中再次播放时，就会出现歌词不会跳转到起始位置
+              if (this.currentLyric) {
                 this.currentLyric.seek(0)
               }
             },
-            next(){
-              if(!this.songReady){
+            // 下一首歌
+            next () {
+              // 如果歌曲没有加载好就不让执行下一首歌
+              if (!this.songReady) {
                 return
               }
-              if(this.playlist.length===1){
+              if (this.playlist.length === 1) {
                 this.loop()
-              }else{
-              let index = this.currentIndex + 1
-              if(index === this.playlist.length){
-                index = 0
+                return
+              } else {
+                // 下一首索引值加1
+                let index = this.currentIndex + 1
+                // 顺序播放的情况
+                if (index === this.playlist.length) {
+                  index = 0
+                }
+                // 调用mutation的方法
+                this.setCurrentIndex(index)
+                // 如果歌曲暂停时点击下一首歌要触发歌曲播放
+                if (!this.playing) {
+                  this.togglePlaying()
+                }
               }
-              this.setCurrentIndex(index)
-              if(!this.playing){
-                this.togglePlaying()
-              }
-              }
+              // 点击下一首歌后将原先的状态变为false
               this.songReady = false
             },
-            prev(){
-              if(!this.songReady){
+            // 上一首歌
+            prev () {
+              // 如果歌曲没有加载好就不让执行上一首歌
+              if (!this.songReady) {
                 return
               }
-              if(this.playlist.length===1){
+              if (this.playlist.length === 1) {
                 this.loop()
-              }else{
-              let index = this.currentIndex - 1
-              if(index === -1){
-                index = this.playlist.length - 1
+                return
+              } else {
+                let index = this.currentIndex - 1
+                if (index === -1) {
+                  index = this.playlist.length - 1
+                }
+                // 调用mutation的方法
+                this.setCurrentIndex(index)
+                // 如果歌曲暂停时点击上一首歌要触发歌曲播放
+                if (!this.playing) {
+                  this.togglePlaying()
+                }
               }
-              this.setCurrentIndex(index)
-                if(!this.playing){
-                this.togglePlaying()
-              }
-              }
+              // 点击下一首歌后将原先的状态变为false
               this.songReady = false
             },
             ready(){
@@ -299,8 +326,9 @@
             updateTime(e){
               this.currentTime = e.target.currentTime
             },
-            format(interval){
-              interval = interval | 0
+            // 时间格式化（将时间戳格式化）
+            format (interval) {
+              interval = interval | 0 // | 0表示向下取整（相当于Math.floor()）
               const minute = interval / 60 | 0
               const second = this._pad(interval % 60)
               return `${minute}:${second}`

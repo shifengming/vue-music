@@ -11,7 +11,7 @@
     </div>
 </template>
 <script type="text/ecmascript-6">
-    export default{
+    export default {
         props:{
             songs:{
                 type: Array,

@@ -19,7 +19,7 @@
     const progressBtnWidth = 16
     const transform = prefixStyle('transform')
 
-    export default{
+    export default {
         props:{
             percent:{
                 type: Number,
