@@ -15,6 +15,7 @@ const state = {
     //当前播放的一个索引(比如当前播放的是哪首歌)
     currentIndex: -1,
     //定义歌单的一个对象
-    disc: {}
+    disc: {},
+    topList: {}
 }
 export default state

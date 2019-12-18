@@ -50,7 +50,7 @@ export function createSong(musicData, songVkey){
         url: `https://thirdparty.gtimg.com/${musicData.songid}.m4a?fromtag=38`
     })
 }
-function filterSinger(singer){
+export function filterSinger(singer){
     let ret = []
     if(!singer){
         return ''

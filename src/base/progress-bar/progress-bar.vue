@@ -1,16 +1,18 @@
 <template>
     <div class="progress-bar" ref="progressBar" @click="progressClick">
-        <div class="bar-inner">
-            <!-- 整个进度条 -->
-            <div class="progress" ref="progress"></div>
-            <div class="progress-btn-wrapper" ref="progressBtn"
-                @touchstart.prevent="progressTouchStart"
-                @touchmove.prevent="progressTouchMove"
-                @touchend.prevent="progressTouchEnd"
-            >
-                <div class="progress-btn"></div>
-            </div>
+      <div class="bar-inner">
+        <!--整个进度条-->
+        <div class="progress" ref="progress"></div>
+        <!--注意：在操作进度条上小球的移动时候要禁止浏览器的默认行为prevent-->
+        <div class="progress-btn-wrapper" ref="progressBtn"
+             @touchstart.prevent="progressTouchStart"
+             @touchmove.prevent="progressTouchMove"
+             @touchend.prevent="progressTouchEnd"
+        >
+          <!--进度条当前的位置-->
+          <div class="progress-btn"></div>
         </div>
+      </div>
     </div>
 </template>
 
@@ -26,17 +28,17 @@
                 default: 0
             }
         },
-        created(){
+        created() {
             this.touch = {}
         },
-        methods:{
-            progressTouchStart(e){
+        methods: {
+            progressTouchStart(e) {
                 this.touch.initiated = true
                 this.touch.startX = e.touches[0].pageX
                 this.touch.left = this.$refs.progress.clientWidth
             },
-            progressTouchMove(e){
-                if(!this.touch.initiated){
+            progressTouchMove(e) {
+                if(!this.touch.initiated) {
                     return
                 }
                 const deltaX = e.touches[0].pageX - this.touch.startX
@@ -68,20 +70,24 @@
         },
         //通过watch percent的变化
         watch:{
-            percent(newPercent){
-                if(newPercent >= 0 && !this.touch.initiated){
-                    const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
-                    const offsetWidth = newPercent * barWidth
-                    this._offset(offsetWidth)
-                }
+            // 监测外面传来的百分比
+            percent (newPercent) {
+              if (newPercent >= 0 && !this.touch.initiated) {
+                // 整个进度条的宽度
+                const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
+                // 小球在进度条上向左偏移的长度
+                const offsetWidth = newPercent * barWidth
+                // this.$refs.progress.style.width = `${offsetWidth}px`
+                // this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
+                this._offset(offsetWidth)
+              }
             }
         }
     }
 </script>
 
-<style scoped lang="stylus" rel="stylesheet/stylus">
-    @import "~common/stylus/variable"
-
+<style lang="stylus" rel="stylesheet/stylus" scoped>
+@import "~common/stylus/variable"
 .progress-bar
   height: 30px
   .bar-inner

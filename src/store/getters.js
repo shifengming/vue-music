@@ -23,3 +23,5 @@ export const currentSong = (state) => {
 //修改就要到mutation里，修改之前也是先写mutations-types
 
 export const disc = state => state.disc
+
+export const topList = state => state.topList
