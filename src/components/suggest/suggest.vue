@@ -91,7 +91,8 @@ import NoResult from 'base/no-result/no-result'
             getDisplayName(item){
                 if(item.type === TYPE_SINGER){
                     return item.singername
-                    // console.log(item.singername)
+
+                    console.log(item.singername)
                 }else{
                     return '${item.name}-${item.singer}'
                 }
