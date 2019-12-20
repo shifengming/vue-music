@@ -17,5 +17,6 @@ export const SET_CURRENT_INDEX = 'SET_CURRENT_INDEX'
 // 设置歌单信息
 export const SET_DISC = 'SET_DISC'
 
-export const SET_TOP_LIST = "SET_TOP_LIST"
+export const SET_TOP_LIST = 'SET_TOP_LIST'
 
+export const SET_SEARCH_HISTORY = 'SET_SEARCH_HISTORY'
