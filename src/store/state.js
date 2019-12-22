@@ -1,6 +1,6 @@
 //state只保留一些最基础的数据，通过这些基础数据计算而来的，都不放在state里面，放getters
 import {playMode} from "common/js/config"
-import {loadSearch, loadPlay} from 'common/js/cache'
+import {loadSearch, loadPlay, loadFavorite} from 'common/js/cache'
 const state = {
     singer:{},
     //播放器默认为false
@@ -20,6 +20,8 @@ const state = {
     topList: {},
     searchHistory: loadSearch(),
     //播放历史
-    playHistory: loadPlay()
+    playHistory: loadPlay(),
+    //收藏列表
+    favoriteList: loadFavorite()
 }
 export default state

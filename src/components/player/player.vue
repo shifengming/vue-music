@@ -89,7 +89,7 @@
                     </div>
                     <!-- 点击显示播放列表的歌曲 -->
                     <div class="icon i-right">
-                        <i class="icon icon-not-favorite"></i>
+                        <i class="icon" @click="toggleFavorite(currentSong)" :class="getFavoriteIcon(currentSong)"></i>
                     </div>
                 </div>
             </div>
@@ -122,7 +122,7 @@
         </div>
       </transition>
       <playlist ref="playlist"></playlist>
-      <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"> 
+      <audio ref="audio" :src="currentSong.url" @play="ready" @error="error" @timeupdate="updateTime" @ended="end"> 
 
       </audio>
     </div>
@@ -344,6 +344,9 @@
             
             getLyric(){
               this.currentSong.getLyric().then((lyric)=>{
+                if(this.currentSong.lyric !== lyric){
+                  return
+                }
                 this.currentLyric = new Lyric(lyric, this.handleLyric)
                 if(this.playing){
                   this.currentLyric.play()
@@ -473,7 +476,8 @@
               this.currentLineNum = 0
 
             } 
-            setTimeout(() => {
+            clearTimeout(this.timer)
+            this.timer = setTimeout(() => {
               this.$refs.audio.play()
               this.getLyric()
             },1000)
