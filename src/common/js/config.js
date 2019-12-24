@@ -1,9 +1,7 @@
-//配置一个playMode
+// 播放模式 0-顺序播放、1-循环播放、2-随机播放
 export const playMode = {
-
     sequence: 0,
-    //循环播放
     loop: 1,
-    //随机播放
     random: 2
-}
+  }
+  

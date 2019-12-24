@@ -1,34 +1,38 @@
 <template>
-    <div class="search-list" v-show="searches.length">
-        <transition-group name="list" tag="ul">
-            <li :key="item" @click="selectItem(item)" class="search-item" v-for="item in searches">
-                <span class="text">{{item}}</span>
-                <span class="icon" @click.stop="deleteOne(item)">
-                    <i class="icon-delete"></i>
-                </span>
-            </li>
-        </transition-group>
+    <div class="search-list">
+      <ul>
+        <li @click="selectItem(item)" v-for="(item, index) in searches" :key="index" class="search-item">
+          <span class="text">{{item}}</span>
+          <!--子元素中有点击事件要用stop防止点击事件冒泡-->
+          <span class="icon" @click.stop="deleteOne(item)">
+            <i class="icon-delete"></i>
+          </span>
+        </li>
+      </ul>
     </div>
 </template>
 
-<script type="text/ecmascript-6">
-    export default {
-        props:{
-            searches: {
-                type: Array,
-                default: []
-            }
-        },
-        methods:{
-            selectItem(item){
-                this.$emit('select',item)
-            },
-            deleteOne(item){
-                this.$emit('delete',item)
-            }
-        }
+<script>
+export default {
+  name: 'search-list',
+  props: {
+    searches: {
+      type: Array,
+      default: null
     }
+  },
+  methods: {
+    // 注意：基础组件不会写太多的逻辑
+    selectItem (item) {
+      this.$emit('select', item)
+    },
+    deleteOne (item) {
+      this.$emit('delete', item)
+    }
+  }
+}
 </script>
+
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   @import "~common/stylus/variable"
   .search-list

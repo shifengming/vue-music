@@ -11,6 +11,8 @@
 </template>
 <script type="text/ecmascript-6">
     export default {
+        name: 'progress-circle',
+        //父组件传给子组件的属性
         props:{
             radius:{
                 type: Number,

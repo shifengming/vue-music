@@ -9,6 +9,7 @@
 <script type="text/ecmascript-6">
     import {debounce} from 'common/js/util'
     export default {
+        name: 'serch-box',
         props: {
             placeholder:{
                 type: String,
@@ -21,15 +22,17 @@
             }
         },
         methods:{
+            //点击右侧删除将输入框中的数据清空
             clear(){
                 this.query = ''
             },
             setQuery (query) {
                 this.query = query
                 },
-                blur(){
-                    this.$refs.query.blur()
-                }
+            //创建主动设置input变量值，赋值给父级data中
+            blur(){
+                this.$refs.query.blur()
+            }
         },
         created(){
             this.$watch('query',debounce((newQuery) => {

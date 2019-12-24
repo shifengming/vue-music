@@ -1,56 +1,66 @@
 <template>
     <div class="song-list">
-        <ul>
-            <li @click="selectItem(song, index)" v-for="(song, index) in songs" :key="index" class="item">
-                <div class="rank" v-show="rank">
-                    <span :class="getRankCls(index)">{{getRankText(index)}}</span>
-                </div>
-                <div class="content">
-                    <h2 class="name">{{song.name}}</h2>
-                    <p class="desc">{{getDesc(song)}}</p>
-                </div>
-            </li>
-        </ul>
+      <ul>
+        <li v-for="(song, index) in songs" :key="index" class="item" @click="selectItem(song, index)">
+          <!--<p class="count">{{index + 1}}</p>-->
+          <div class="rank" v-show="rank">
+            <span :class="getRankCls(index)" v-text="getRankText(index)"></span>
+          </div>
+          <div class="content">
+            <h2 class="name">{{song.name}}</h2>
+            <p class="desc">{{getDesc(song)}}</p>
+          </div>
+        </li>
+      </ul>
     </div>
 </template>
-<script type="text/ecmascript-6">
-    export default {
-        props:{
-            songs:{
-                type: Array,
-                default: []
-            },
-            rank:{
-                type: Boolean,
-                default: false
-            }
-        },
-        methods:{
-            selectItem(item,index){
-                this.$emit('select', item, index)
-            },
-            getDesc(song){
-                return `${song.singer} - ${song.album}`
-            },
-            getRankCls(index){
-                if(index <= 2){
-                    return `icon icon${index}`
-                }else{
-                    return `text`
-                }
-            },
-            getRankText(index){
-                if(index>2){
-                    return index + 1
-                }
-            }
-        }
+
+<script>
+export default {
+  name: 'song-list',
+  props: {
+    songs: {
+      type: Array,
+      default: null
+    },
+    // 排行样式
+    rank: {
+      type: Boolean,
+      default: false
     }
+  },
+  methods: {
+    getDesc (song) {
+      if (song.aliaName) {
+        return `${song.singer} - ${song.album}`
+      } else {
+        return `${song.singer}`
+      }
+    },
+    // 传递两个参数，一为当前点击的歌曲，二为当前歌曲的索引
+    selectItem (item, index) {
+      // 向父组件派发一个select事件，点击的歌曲为item，该歌曲的索引为index
+      this.$emit('select', item, index)
+    },
+    getRankCls (index) {
+      if (index <= 2) {
+        return `icon icon${index}`
+      } else {
+        return 'text'
+      }
+    },
+    getRankText (index) {
+      if (index > 2) {
+        return index + 1
+      }
+    }
+  }
+}
 </script>
+
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
   @import "~common/stylus/mixin"
-
   .song-list
     .item
       display: flex

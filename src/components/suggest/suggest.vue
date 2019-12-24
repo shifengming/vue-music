@@ -1,171 +1,182 @@
+<!-- 搜索建议页列表组件 -->
 <template>
-    <scroll class="suggest" 
-            :data="result" 
-            :pullup="pullup"
-            :beforeScroll="beforeScroll"
-            @scrollToEnd="searchMore"
-            @beforeScroll="listScroll"
-            ref="suggest"
-            >
-        <ul class="suggest-list">
-            <li @click="selectItem(item)" class="suggest-item" v-for="(item,index) in result" :key="index">
-                <div class="icon">
-                    <i :class="getIconCls(item)"></i>
-                </div>
-                <div class="name">
-                    <p class="text" v-html="getDisplayName(item)"></p>
-                </div>
-            </li>
-            <loading v-show="hasMore" title=""></loading>
-        </ul>
-        <div v-show="!hasMore && !result.length" class="no-result-wrapper">
+  <scroll class="suggest" ref="suggest" :data="result" @beforeScroll="listScroll" :beforeScroll="beforeScroll" :pullup="pullup" @scrollToEnd="searchMore">
+    <ul class="suggest-list">
+      <li class="suggest-item" v-for="(item, index) in result" @click="selectItem(item)" :key="index">
+        <div class="icon">
+          <i :class="getIconCls(item)"></i>
+        </div>
+
+        <div class="name">
+          <p class="text" v-html="getSingernameOrSongname(item)"></p>
+        </div>
+      </li>
+      <loading v-show="hasMore" title=""></loading>
+    </ul>
+    <div v-show="!hasMore && !result.length" class="no-result-wrapper">
       <no-result title="抱歉，暂无搜索结果"></no-result>
     </div>
-    </scroll>
+  </scroll>
 </template>
-<script type="text/ecmascript-6">
-    import {search} from 'api/search'
-    import {ERR_OK} from 'api/config'
-    import {createSong} from 'common/js/song'
-    import Scroll from 'base/scroll/scroll'
-    import Loading from 'base/loading/loading'
-    import Singer from 'common/js/singer'
-    import {mapMutations,mapActions} from 'vuex'
+
+<script>
+import Scroll from 'base/scroll/scroll'
+import { search } from 'api/search'
+import { createSong1 } from 'common/js/song'
+import Singer from 'common/js/singer'
+import {ERR_OK} from 'api/config'
+import Loading from 'base/loading/loading'
 import NoResult from 'base/no-result/no-result'
-
-    const TYPE_SINGER = "singer"
-    const perpage = 20
-
-
-    export default {
-        props: {
-            query: {
-                type: String,
-                default: ''
-            },
-            showSinger: {
-                type: Boolean,
-                default: true
-            }
-        },
-        data(){
-            return{
-                page: 1,
-                result: [],
-                pullup: true,
-                beforeScroll: true,
-                hasMore: true
-            }
-        },
-        methods:{
-            search(){
-                this.page = 1
-                this.hasMore = true
-                this.$refs.suggest.scrollTo(0, 0)
-                search(this.query, this.page, this.perpage, this.zhida).then((res) => {
-                    if(res.code === ERR_OK){
-                        this.result = this._genResult(res.data)
-                        this._checkMore(res.data)
-                    }
-                })
-            },
-            searchMore(){
-                if(!this.hasMore){
-                    return
-                }
-                this.page++
-                search(this.query,this.page,this.zhida,this.perpage).then((res)=>{
-                    if(res.code === ERR_OK){
-                        this.result = this.result.concat(this._formatSearch(res.data))
-                        this._checkMore(res.data)
-                    }
-                })
-            },
-            getIconCls (item) {
-                if (item.type === TYPE_SINGER) {
-                    return 'icon-mine'
-                }else{
-                    return 'icon-music'
-                }
-            },
-            getDisplayName(item){
-                if(item.type === TYPE_SINGER){
-                    return item.singername
-
-                    console.log(item.singername)
-                }else{
-                    return '${item.name}-${item.singer}'
-                }
-            },
-            selectItem(item){
-                if(item.type === TYPE_SINGER){
-                    const singer = new Singer({
-                        id: item.singermid,
-                        name: item.singername
-                    })
-                    this.$router.push({
-                        path: '/search/${singer.id}'
-                    })
-                    this.setSinger(singer)
-                }else{
-                    this.insertSong(item)
-                }
-                this.$emit('select')
-            },
-            refresh(){
-                this.$refs.suggest.refresh()
-            },
-            listScroll(){
-                this.$emit('listScroll')
-            },
-            _checkMore(data){
-                const song = data.song
-                if(!song.list.length || (song.curnum + song.curpage * perpage) >= song.totalnum){
-                    this.hasMore = false
-                }
-            },
-            _genResult(data){
-                let ret = []
-                if(data.zhida && data.zhida.singerid){
-                    ret.push({...data.zhida, ...{type: TYPE_SINGER}})
-                }
-                if(data.song){
-                    ret = ret.concat(this._normalizeSongs(data.song.list))
-                }
-                return ret
-            },
-            _normalizeSongs(list){
-                let ret = []
-                list.forEach((musicData) => {
-                    if(musicData.songid && musicData.albumid){
-                        ret.push(createSong(musicData))
-                    }
-                })
-                 return ret
-            },
-            ...mapMutations({
-             setSinger: 'SET_SINGER'
-          }),
-          ...mapActions([
-              'insertSong'
-          ])
-        },
-        watch: {
-            query(){
-                this.search()
-            }
-        },
-        components:{
-            Scroll,
-            Loading,
-            NoResult
-        }
+import {mapMutations, mapActions} from 'vuex'
+const TYPE_SINGER = 'singer'
+export default {
+  components: {
+    Scroll,
+    Loading,
+    NoResult
+  },
+  data () {
+    return {
+      // 当前检索页数，用于下拉加载
+      page: 1,
+      // 每一页的数量
+      perpage: 20,
+      // 接受检索结果
+      result: [],
+      // 标志位。是否加载完
+      hasMore: true,
+      beforeScroll: true,
+      pullup: true
     }
+  },
+  props: {
+    // 接受的检索值
+    query: {
+      type: String,
+      default: ''
+    },
+    // 是否显示歌手
+    zhida: {
+      type: Boolean,
+      default: true
+    }
+  },
+  watch: {
+    query (newVal) {
+      this.search()
+    }
+  },
+  methods: {
+    refresh () {
+      this.$refs.suggest.refresh()
+    },
+    // 监听列表有滚动
+    listScroll () {
+      this.$emit('listScroll')
+    },
+    search () {
+      this.page = 1
+      this.hasMore = true
+      this.$refs.suggest.scrollTo(0, 0)
+      search(this.query, this.page, this.perpage, this.zhida).then((res) => {
+        if (res.code === ERR_OK) {
+          console.log(res.data)
+          // console.log(this._formatSearch(res.data))
+          this.result = this._formatSearch(res.data)
+          this._checkMore(res.data)
+          // console.log(this.result)
+        }
+      })
+    },
+    // 重组 res.data 数据
+    _formatSearch (data) {
+      let ret = []
+      if (data.zhida && data.zhida.zhida_singer) {
+        // 解构赋值
+        ret.push({...data.zhida, ...{type: TYPE_SINGER}})
+      }
+      if (data.song) {
+        ret = ret.concat(this._normalizeSongs(data.song.list))
+      }
+      return ret
+    },
+    // 格式化歌手信息
+    _normalizeSongs (list) {
+      let ret = []
+      list.forEach((item) => {
+        if (item.songid && item.albummid) {
+          ret.push(createSong1(item))
+        }
+        // ret.push(createSong2(item))
+      })
+      return ret
+    },
+    // 获取 icon class 图标样式
+    getIconCls (item) {
+      if (item.type === TYPE_SINGER) {
+        return 'icon-mine'
+      } else {
+        return 'icon-music'
+      }
+    },
+    getSingernameOrSongname (item) {
+      if (item.type === TYPE_SINGER) {
+        return item.zhida_singer.singerName
+        // return this.query
+      } else {
+        return `${item.name}-${item.singer}`
+      }
+      // return `${item.name}-${item.singer}`
+    },
+    // 路由跳转逻辑
+    selectItem (item) {
+      console.log(item)
+      if (item.type === TYPE_SINGER) {
+        let singer = new Singer({
+          id: item.zhida_singer.singerMID,
+          name: item.zhida_singer.singerName
+        })
+        this.$router.push({
+          path: `/search/${singer.id}`
+        })
+        this.setSinger(singer)
+      } else {
+        this.insertSong(item)
+      }
+      // 父组件为search.vue
+      this.$emit('select', item)
+    },
+    searchMore () {
+      if (!this.hasMore) {
+        return
+      }
+      this.page++
+      search(this.query, this.page, this.zhida, this.perpage).then((res) => {
+        if (res.code === ERR_OK) {
+          this.result = this.result.concat(this._formatSearch(res.data))
+          this._checkMore(res.data)
+        }
+      })
+    },
+    _checkMore (data) {
+      const song = data.song
+      if (!song.list.length || (song.curnum + song.curpage * this.perpage) >= song.totalnum) {
+        this.hasMore = false
+      }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    }),
+    ...mapActions([
+      'insertSong'
+    ])
+  }
+}
 </script>
-<style scoped lang="stylus" ref="stylesheet/stylus">
-    @import "~common/stylus/variable"
-    @import "~common/stylus/mixin"
 
+<style lang="stylus" rel="stylesheet/stylus" scoped>
+  @import "~common/stylus/variable"
+  @import "~common/stylus/mixin"
   .suggest
     height: 100%
     overflow: hidden
@@ -193,5 +204,4 @@ import NoResult from 'base/no-result/no-result'
       width: 100%
       top: 50%
       transform: translateY(-50%)
-
 </style>

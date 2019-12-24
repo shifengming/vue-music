@@ -17,6 +17,7 @@
 
 <script type="text/ecmascript-6">
     export default {
+      name: 'confirm',
         props:{
             text: {
                 type: String,

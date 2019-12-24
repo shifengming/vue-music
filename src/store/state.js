@@ -1,27 +1,19 @@
-//state只保留一些最基础的数据，通过这些基础数据计算而来的，都不放在state里面，放getters
-import {playMode} from "common/js/config"
-import {loadSearch, loadPlay, loadFavorite} from 'common/js/cache'
+import {playMode} from 'common/js/config'
+import {loadSearch, loadFavorite, loadPlay} from 'common/js/cache'
+
 const state = {
-    singer:{},
-    //播放器默认为false
-    playing: false,
-    //默认全屏false
-    fullScreen: false,
-    //歌曲播放列表
-    playlist: [],
-    //顺序列表
-    sequenceList:[],
-    //播放模式,默认顺序播放(sequence)
-    mode: playMode.sequence,
-    //当前播放的一个索引(比如当前播放的是哪首歌)
-    currentIndex: -1,
-    //定义歌单的一个对象
-    disc: {},
-    topList: {},
-    searchHistory: loadSearch(),
-    //播放历史
-    playHistory: loadPlay(),
-    //收藏列表
-    favoriteList: loadFavorite()
+  singer: {}, // 歌手信息
+  playing: false, // 是否播放
+  fullScreen: false, // 是否全屏
+  playlist: [], // 播放列表，前进后退，说明歌曲是一个列表
+  sequenceList: [], // 播放顺序
+  mode: playMode.sequence, // 播放模式
+  currentIndex: -1, // 当前播放的是那一首歌，前进后退就会修改这个index值
+  disc: {}, // 歌单信息
+  topList: {}, // 热门推荐歌曲信息
+  searchHistory: loadSearch(), // 搜索关键字历史
+  favoriteList: loadFavorite(), // 喜欢列表
+  playHistory: loadPlay() // 播放历史
 }
+
 export default state

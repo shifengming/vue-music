@@ -18,40 +18,42 @@
 
 <script type="text/ecmascript-6">
     import {prefixStyle} from 'common/js/dom'
+    //进度条上小球的宽度
     const progressBtnWidth = 16
     const transform = prefixStyle('transform')
 
     export default {
         props:{
-            percent:{
+            percent:{//进度条百分比
                 type: Number,
                 default: 0
             }
         },
         created() {
+          //移动小球时下面三个时间可以将内容挂载到touch对象上
             this.touch = {}
         },
         methods: {
             progressTouchStart(e) {
-                this.touch.initiated = true
-                this.touch.startX = e.touches[0].pageX
-                this.touch.left = this.$refs.progress.clientWidth
+                this.touch.initiated = true//表示小球已经初始化
+                this.touch.startX = e.touches[0].pageX//记录手点击小球后第一个横向坐标
+                this.touch.left = this.$refs.progress.clientWidth//记录小球已经在进度条上滚动距离坐标的长度
             },
             progressTouchMove(e) {
                 if(!this.touch.initiated) {
                     return
                 }
-                const deltaX = e.touches[0].pageX - this.touch.startX
+                const deltaX = e.touches[0].pageX - this.touch.startX//记录小球被拉了多长
                 const offsetWidth = Math.min(this.$refs.progressBar.clientWidth - progressBtnWidth,Math.max(0,this.touch.left + deltaX))
                 this._offset(offsetWidth)
             },
             progressTouchEnd(){
-                this.touch.initiated = false
+                this.touch.initiated = false //移动小球结束后将初始化数据变成false
                 this._triggerPercent()
             },
             progressClick(e){
                 const rect = this.$refs.progressBar.getBoundingClientRect()
-                const offsetWidth = e.pageX - rect.left
+                const offsetWidth = e.pageX - rect.left// e.pageX是获取小球到浏览器边缘的距离，getBoundingClientRect是进度条最左边到浏览器边缘的距离
                 this._offset(offsetWidth)
                 //这里当我们点击progressBtn的时候，e.offsetX获取不对
                 // this._offset(e.offsetX)

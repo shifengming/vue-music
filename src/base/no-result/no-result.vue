@@ -7,6 +7,7 @@
 
 <script type="text/ecmascript-6">
     export default {
+        name: 'no-result',
         props:{
             title:{
                 type: String,
